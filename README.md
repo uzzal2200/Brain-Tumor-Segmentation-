@@ -93,3 +93,80 @@ If you want me to perform any of the next steps above, tell me which one and I w
 
 With best regards,
 Your collaborator
+
+---
+
+Note: The notebook in this repository is actually `EffiDec3D_Brain_tumor_segmentation (1).ipynb`. The following section below is an expanded README that mirrors that notebook's exact workflow, configuration, and commands. Use it if you want a reproducible, notebook-aligned README.
+
+## Notebook-aligned README (details from the notebook)
+
+This section summarizes the actual workflow implemented in the notebook titled `EffiDec3D_Brain_tumor_segmentation (1).ipynb`.
+
+### Purpose
+- Demonstrates a 2D encoder-decoder segmentation model (named `EffiDec3D_Medium` in the notebook) trained on the LGG MRI segmentation dataset (Kaggle: mateuszbuda/lgg-mri-segmentation).
+
+### Notebook highlights
+- Downloads the Kaggle dataset using `opendatasets`.
+- Builds a pandas DataFrame of image/mask pairs and labels images by whether the mask contains positive pixels (used for oversampling).
+- Uses Keras `ImageDataGenerator` for images and masks, with an `adjust_data` function that normalizes images and thresholds masks.
+- Custom metrics and losses: `dice_coef`, `dice_loss`, `bce_dice_loss`, and `iou`.
+- Architecture details:
+  - `dynamic_selector`: a channel-wise SE-style selector
+  - `nas_decoder_block`: a NAS-inspired decoder block mixing two branch outputs by learned weights
+  - `enc_block`: simple conv-conv-pool encoder blocks
+  - `EffiDec3D_Medium(input_shape=(256,256,3))`: assembled encoder-decoder model
+- Training config in the notebook: optimizer Adam(3e-4), loss `bce_dice_loss`, metrics `binary_accuracy`, `dice_coef`, `iou`.
+- Checkpoint: `ModelCheckpoint("EffiDec3D_Medium_best.keras", save_best_only=True)`
+
+### Important hyperparameters (as used in the notebook)
+- Input size: 256 x 256 (3 channels)
+- Batch size: 16
+- Epochs: 50
+
+### Dependencies (minimum list)
+- Python 3.8+
+- opendatasets
+- tensorflow (2.x)
+- numpy
+- pandas
+- matplotlib
+- scikit-learn
+- opencv-python
+
+### Install (Windows PowerShell)
+```powershell
+python -m venv .venv; .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install opendatasets tensorflow numpy pandas matplotlib scikit-learn opencv-python
+```
+
+### Dataset
+- Kaggle dataset used in the notebook: https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation/data
+- The notebook downloads it with `opendatasets` and expects a structure similar to:
+
+  `./lgg-mri-segmentation/kaggle_3m/*/*_mask*`
+
+### Run steps (summary)
+1. Create and activate virtual environment and install dependencies (see above).
+2. Open Jupyter and run the notebook:
+
+```powershell
+jupyter notebook "EffiDec3D_Brain_tumor_segmentation (1).ipynb"
+```
+
+3. Run cells sequentially: dataset download, generator creation, model definition, and `model.fit(...)`.
+
+### Notes
+- `opendatasets` may require Kaggle credentials (`kaggle.json`) placed under `%USERPROFILE%\.kaggle\` or follow prompts from the package.
+- If you hit OOM during training, reduce the batch size or input resolution.
+- GFLOPs profiling in the notebook uses TensorFlow profiler internals and may require additional TF packages; it is optional.
+
+### Outputs
+- The main artifact produced by the notebook is the checkpoint file `EffiDec3D_Medium_best.keras`.
+
+### Optional extras I can add
+- `requirements.txt` with pinned versions
+- `tools/check_env.py` to validate imports and versions
+- Merge `read.md` and `README.md` into a single canonical `README.md`
+
+If you'd like any of these extras created, tell me which and I will add them.
